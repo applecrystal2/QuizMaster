@@ -24,27 +24,26 @@ public class Timer : MonoBehaviour
     private void UpdateFillAmount()
     {
         if (isProblemTime)
-        {
             fillAmount = time / problmTime;
-            if (time <= 0f)
+        else
+            fillAmount = time / solutionTime;
+    }
+    private void TimerCountDown()
+    {
+        time -= Time.deltaTime;
+        if (time <= 0f)
+        {
+            if (isProblemTime)
             {
                 isProblemTime = false;
                 time = solutionTime;
             }
-        }
-        else
-        {
-            fillAmount = time / solutionTime;
-            if (time <= 0f)
+            else
             {
                 isProblemTime = true;
                 time = problmTime;
             }
         }
-    }
-    private void TimerCountDown()
-    {
-        time -= Time.deltaTime;
     }
 }
 
