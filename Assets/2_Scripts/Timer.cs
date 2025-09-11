@@ -9,10 +9,12 @@ public class Timer : MonoBehaviour
 
     [HideInInspector] public bool isProblemTime = true;
     [HideInInspector] public float fillAmount;
+    [HideInInspector] public bool loadNextQuestion;
 
     private void Start()
     {
         time = problmTime;
+        loadNextQuestion = true;
     }
 
     private void Update()
@@ -42,8 +44,13 @@ public class Timer : MonoBehaviour
             {
                 isProblemTime = true;
                 time = problmTime;
+                loadNextQuestion = true;
             }
         }
+    }
+    public void CancelTimer()
+    {
+        time = 0f;
     }
 }
 
