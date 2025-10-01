@@ -29,6 +29,10 @@ public class GameManager : MonoBehaviour
         //ShowQuizScene();
     }
 
+    public void OnStartButtonClick()
+    {
+        SceneManager.LoadScene("MainScene");
+    }
     public void ShowQuizScene()
     {
         quiz.gameObject.SetActive(true);
@@ -56,4 +60,5 @@ public class GameManager : MonoBehaviour
         Debug.Log("Restarting the game...");
         SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);     
     }
+   
 }
