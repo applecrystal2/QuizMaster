@@ -11,6 +11,10 @@ public class GameManager : MonoBehaviour
     [SerializeField] private GameObject loadingCanvas;
     SceneManager sceneManager;
 
+    // 1. 오디오 관련 필드 추가
+    [SerializeField] private AudioSource audioSource;
+    [SerializeField] private AudioClip mainSceneMusic;
+
     void Awake()
     {
         if (Instance == null)
@@ -26,6 +30,13 @@ public class GameManager : MonoBehaviour
 
     void Start()
     {
+        // 2. MainScene에서 음악 재생
+        if (SceneManager.GetActiveScene().name == "MainScene" && audioSource != null && mainSceneMusic != null)
+        {
+            audioSource.clip = mainSceneMusic;
+            audioSource.loop = true;
+            audioSource.Play();
+        }
         //ShowQuizScene();
     }
 
@@ -47,7 +58,6 @@ public class GameManager : MonoBehaviour
         endScreen.ShowFinalScore();
         loadingCanvas.SetActive(false);
     }
-
 
     public void ShowLoadingScreen()
     {

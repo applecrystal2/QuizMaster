@@ -1,58 +1,3 @@
-//using NUnit.Framework;
-//using System;
-//using System.Collections;
-//using System.Collections.Generic;
-//using UnityEngine;
-
-//public class ChatGPTClient : MonoBehaviour
-//{
-
-
-
-
-//    public delegate void QuizGenerateHandler(List<QuestionSO> questions);
-//    public event QuizGenerateHandler quizGenerateHandler;
-
-//    public void GenerateQuestions(int questionCount, string topicToUse)
-//    {
-//        Debug.Log($"Generating {questionCount} questions on the Topic: {topicToUse}...");
-
-//        StartCoroutine(GenerateWithDelay());
-//    }
-
-//    private IEnumerator GenerateWithDelay()
-//    {
-//        yield return new WaitForSeconds(3f);
-//        List<QuestionSO> questions = new List <QuestionSO>();
-//        QuestionSO so1 = CreateQuestion("GPT 생성 질문 1",
-//            new string[] { "1번답(정답)", "2번답", "3번답", "4번답" }, 
-//            0);
-//        questions.Add(so1);
-//        QuestionSO so2 = CreateQuestion("GPT 생성 질문 1",
-//            new string[] { "1번답", "2번답(정답)", "3번답", "4번답" },
-//            1);
-//        questions.Add(so2);
-//        QuestionSO so3 = CreateQuestion("GPT 생성 질문 1",
-//            new string[] { "1번답", "2번답", "3번답(정답)", "4번답" },
-//            2);
-//        questions.Add(so3);
-
-//        quizGenerateHandler?.Invoke(questions);
-//        Debug.Log("Finished GenerateWithDelay.....");
-
-//    }
-
-//    QuestionSO CreateQuestion(string q, string[] a, int correctIndex)
-//    {
-//        QuestionSO so = ScriptableObject.CreateInstance<QuestionSO>();
-//        so.SetData(q, a, correctIndex);
-
-//        return so;
-
-//    }
-
-
-//}
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -105,17 +50,17 @@ public class QuizQuestion
 public class ChatGPTClient : MonoBehaviour
 {
     private const string API_URL = "https://api.openai.com/v1/chat/completions";
-    private string apikey;
 
     public delegate void QuizGenerateHandler(List<QuestionSO> questions);
     public event QuizGenerateHandler quizGenerateHandler;
 
+    private string apiKey;
+
     private void Awake()
     {
-        apikey = LoadFromResources();
+        apiKey = LoadFromResources();
+        Debug.Log("Loaded API Key from Resources: " + apiKey);
     }
-
-    private string apiKey;
 
     private string LoadFromResources()
     {
@@ -159,6 +104,7 @@ public class ChatGPTClient : MonoBehaviour
                        "- 문제와 선택지는 흥미롭고 참여하고 싶게 만들어주세요\n" +
                        "- 가능하면 실생활과 연관된 예시나 시나리오를 활용해주세요\n" +
                        "- 응답은 반드시 다음 JSON 형식으로만 제공해주세요:\n" +
+                       "- 문제와 선택지는 30자 이내로만 제공해주세요 :\n" +
                        "{\n" +
                        "  \"questions\": [\n" +
                        "    {\n" +
@@ -282,5 +228,4 @@ public class ChatGPTClient : MonoBehaviour
         PlayerPrefs.SetString("OpenAI_API_Key", key);
         PlayerPrefs.Save();
     }
-
 }
