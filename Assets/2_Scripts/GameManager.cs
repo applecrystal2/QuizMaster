@@ -1,3 +1,4 @@
+using Unity.VisualScripting;
 using UnityEditor.Search;
 using UnityEngine;
 using UnityEngine.SceneManagement;
@@ -11,9 +12,11 @@ public class GameManager : MonoBehaviour
     [SerializeField] private GameObject loadingCanvas;
     SceneManager sceneManager;
 
-    // 1. 오디오 관련 필드 추가
+    // 오디오 관련 필드 추가
     [SerializeField] private AudioSource audioSource;
     [SerializeField] private AudioClip mainSceneMusic;
+    [SerializeField] private AudioClip buttonClickSound; // 일반 버튼 클릭 효과음
+    [SerializeField] private AudioClip correctAnswerSound; // 정답 클릭 효과음
 
     void Awake()
     {
@@ -30,22 +33,24 @@ public class GameManager : MonoBehaviour
 
     void Start()
     {
-        // 2. MainScene에서 음악 재생
+        // MainScene에서 음악 재생
         if (SceneManager.GetActiveScene().name == "MainScene" && audioSource != null && mainSceneMusic != null)
         {
             audioSource.clip = mainSceneMusic;
             audioSource.loop = true;
             audioSource.Play();
         }
-        //ShowQuizScene();
     }
 
     public void OnStartButtonClick()
     {
+        ButtonClickSound(); // 일반 버튼 클릭 효과음 재생
         SceneManager.LoadScene("MainScene");
     }
+
     public void ShowQuizScene()
     {
+        ButtonClickSound(); // 일반 버튼 클릭 효과음 재생
         quiz.gameObject.SetActive(true);
         endScreen.gameObject.SetActive(false);
         loadingCanvas.SetActive(false);
@@ -61,14 +66,42 @@ public class GameManager : MonoBehaviour
 
     public void ShowLoadingScreen()
     {
+        ButtonClickSound(); // 일반 버튼 클릭 효과음 재생
         quiz.gameObject.SetActive(false);
         endScreen.gameObject.SetActive(false);
         loadingCanvas.SetActive(true);
     }
+
     public void OnReplayLevel()
     {
+        ButtonClickSound(); // 일반 버튼 클릭 효과음 재생
         Debug.Log("Restarting the game...");
         SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);     
     }
-   
+
+    public void OnExitButtonClick()
+    {
+        ButtonClickSound(); // 일반 버튼 클릭 효과음 재생
+        Debug.Log("게임 종료");
+        Application.Quit(); // 게임 종료
+        UnityEditor.EditorApplication.isPlaying = false;
+    }
+
+    // 일반 버튼 클릭 효과음 재생 메서드
+    private void ButtonClickSound()
+    {
+        if (audioSource != null && buttonClickSound != null)
+        {
+            audioSource.PlayOneShot(buttonClickSound);
+        }
+    }
+
+    // 정답 클릭 효과음 재생 메서드
+    public void PlayCorrectAnswerSound()
+    {
+        if (audioSource != null && correctAnswerSound != null)
+        {
+            audioSource.PlayOneShot(correctAnswerSound);
+        }
+    }
 }

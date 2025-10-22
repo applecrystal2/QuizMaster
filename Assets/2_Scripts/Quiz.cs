@@ -1,5 +1,6 @@
 using System;
 using TMPro;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
@@ -18,11 +19,15 @@ public class Quiz : MonoBehaviour
     [SerializeField] Sprite defaltAnswerSprite;
     [SerializeField] Sprite correctAnswerSprite;
 
+    [Header("별 색깔")]
+    [SerializeField] Sprite defaltSprite;
+    [SerializeField] Sprite changeSprite;
+
     [Header ("Timer")]
     [SerializeField] Image timerImage;
     [SerializeField] Sprite problemTimerSprite;
     [SerializeField] Sprite solutionTimerSprite;
-    Timer timer;
+    [SerializeField] Timer timer;
 
     [Header ("Sooring")]
     [SerializeField] TextMeshProUGUI scoreText;
@@ -36,8 +41,15 @@ public class Quiz : MonoBehaviour
     [SerializeField] int questionCount = 3;
     [SerializeField] TextMeshProUGUI loadingText;
 
+    [Header("Hint")]
+    [SerializeField] TextMeshProUGUI hintText;
+
     bool isGeneratingQuestions = false;
     bool chooseAnswer = false;
+
+    private int answerCount = 0; // 답변 횟수를 추적하는 변수 추가
+    private bool isQuizComplete = false; // 퀴즈 완료 상태를 추적하는 변수 추가
+    private Coroutine hideHintCoroutine; // 힌트를 숨기는 코루틴을 관리
 
     void Start()
     {
@@ -45,10 +57,12 @@ public class Quiz : MonoBehaviour
         scoreKeeper = FindFirstObjectByType<ScoreKeeper>();
         chatGPTClient.quizGenerateHandler += QuizGenerateHandler;
 
+        
+        timer.OnTenSecondsLeft += HandleTenSecondsLeft; // 10초 남았을 때 이벤트 구독
+
         if (questions.Count == 0)
         {
             GenerateQuestionsIfNeeded();
-
         }
         else
         {
@@ -58,6 +72,37 @@ public class Quiz : MonoBehaviour
         GetNextQuestion();
     }
 
+    
+
+    private void HandleTenSecondsLeft()
+    {
+        if (currentQuestion != null)
+        {
+            hintText.text = "힌트를 가져오는 중...";
+            string question = currentQuestion.GetQuestion();
+            //chatGPTClient.RequestHint(question, DisplayHint);
+        }
+    }
+
+    private void DisplayHint(string hint)
+    {
+        hintText.text = hint; // 힌트를 표시
+
+        // 기존 코루틴이 실행 중이면 중지
+        if (hideHintCoroutine != null)
+        {
+            StopCoroutine(hideHintCoroutine);
+        }
+
+        // 10초 뒤에 힌트를 비활성화하는 코루틴 실행
+        hideHintCoroutine = StartCoroutine(HideHintAfterDelay(10f));
+    }
+
+    private IEnumerator HideHintAfterDelay(float delay)
+    {
+        yield return new WaitForSeconds(delay);
+        hintText.text = ""; // 힌트를 비활성화
+    }
 
     private void GenerateQuestionsIfNeeded()
     {
@@ -86,7 +131,7 @@ public class Quiz : MonoBehaviour
 
     void QuizGenerateHandler(List<QuestionSO> generatedQuestions)
     {
-        //Debug.Log($"QuizGenerateHandler: {generatedQuestions.Count} questions received.");
+        Debug.Log($"QuizGenerateHandler: {generatedQuestions.Count} questions received.");
         isGeneratingQuestions = false;
 
         if(generatedQuestions == null || generatedQuestions.Count == 0)
@@ -127,7 +172,7 @@ public class Quiz : MonoBehaviour
             if (questions.Count <= 0)
             {
                 GenerateQuestionsIfNeeded();
-                //GameManager.Instance.ShowEndScreen();
+                GameManager.Instance.ShowEndScreen();
             }
             else
             {
@@ -146,14 +191,13 @@ public class Quiz : MonoBehaviour
 
     private void GetNextQuestion()
     {
-        if(questions.Count <= 0)
+        if (questions.Count <= 0)
         {
             Debug.Log("더 이상 질문이 없습니다.");
             return;
         }
 
-        timer.loadNextQuestion = false;
-
+        timer.ResetTimer(); // 타이머 초기화 및 남은 시간 표시
         GameManager.Instance.ShowQuizScene();
         chooseAnswer = false;
         SetButtonState(true);
@@ -185,12 +229,21 @@ public class Quiz : MonoBehaviour
     }
     public void OnAnswerButtonClick(int index)
     {
+        if (isQuizComplete) return; // 이미 완료된 경우 실행하지 않음
+
         chooseAnswer = true;
         DisplaySolution(index);
         timer.CancelTimer();
         scoreText.text = $"Score: {scoreKeeper.CalculateScore()}%";
 
+        answerCount++; // 답변 횟수 증가
 
+        // 답변이 3번 완료되었을 때 처리
+        if (answerCount >= 3)
+        {
+            isQuizComplete = true; // 퀴즈 완료 상태로 설정
+            GameManager.Instance.ShowEndScreen(); // EndScreen 실행
+        }
     }
 
     private void DisplaySolution(int index)

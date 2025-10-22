@@ -59,7 +59,6 @@ public class ChatGPTClient : MonoBehaviour
     private void Awake()
     {
         apiKey = LoadFromResources();
-        Debug.Log("Loaded API Key from Resources: " + apiKey);
     }
 
     private string LoadFromResources()
@@ -104,7 +103,6 @@ public class ChatGPTClient : MonoBehaviour
                        "- 문제와 선택지는 흥미롭고 참여하고 싶게 만들어주세요\n" +
                        "- 가능하면 실생활과 연관된 예시나 시나리오를 활용해주세요\n" +
                        "- 응답은 반드시 다음 JSON 형식으로만 제공해주세요:\n" +
-                       "- 문제와 선택지는 30자 이내로만 제공해주세요 :\n" +
                        "{\n" +
                        "  \"questions\": [\n" +
                        "    {\n" +
@@ -144,28 +142,28 @@ public class ChatGPTClient : MonoBehaviour
                 {
                     Debug.Log("Raw response from ChatGPT:\n" + webRequest.downloadHandler.text);
                     ChatGPTResponse response = JsonUtility.FromJson<ChatGPTResponse>(webRequest.downloadHandler.text);
-
+                    
                     if (response == null || response.choices == null || response.choices.Length == 0)
                     {
                         Debug.LogError("Invalid response structure from ChatGPT API");
                         yield break;
                     }
-
+                    
                     if (response.choices[0].message == null)
                     {
                         Debug.LogError("Message content is null in ChatGPT response");
                         yield break;
                     }
-
+                    
                     string jsonContent = response.choices[0].message.content;
-
+                    
                     if (string.IsNullOrEmpty(jsonContent))
                     {
                         Debug.LogError("Content is empty. Finish reason: " + response.choices[0].message);
                         Debug.LogError("Consider increasing max_completion_tokens");
                         yield break;
                     }
-
+                    
                     Debug.Log("Response from ChatGPT:\n" + jsonContent);
                     // JSON 문자열에서 불필요한 부분 제거
                     jsonContent = jsonContent.Trim();
@@ -181,7 +179,6 @@ public class ChatGPTClient : MonoBehaviour
 
                     QuizData quizData = JsonUtility.FromJson<QuizData>(jsonContent);
                     List<QuestionSO> generatedQuestions = CreateQuestionSOs(quizData.questions);
-
                     quizGenerateHandler?.Invoke(generatedQuestions);
                 }
                 catch (Exception e)
