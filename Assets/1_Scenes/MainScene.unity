@@ -2538,7 +2538,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   questionText: {fileID: 940365214}
-  questions: []
+  questions:
+  - {fileID: 11400000, guid: d3043840204d5a74083ac9919b9d89d0, type: 2}
   answerButtons:
   - {fileID: 1125098933}
   - {fileID: 1802944905}
@@ -3237,7 +3238,6 @@ MonoBehaviour:
   isProblemTime: 1
   fillAmount: 0
   loadNextQuestion: 0
-  timerText: {fileID: 0}
 --- !u!1 &1749802135
 GameObject:
   m_ObjectHideFlags: 0
@@ -3855,7 +3855,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: bd77ea862879f0c429df6ecd0066e0ee, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  endScreen: {fileID: 1393638928}
 --- !u!4 &2018647608
 Transform:
   m_ObjectHideFlags: 0
@@ -3910,7 +3909,6 @@ MonoBehaviour:
   isProblemTime: 1
   fillAmount: 0
   loadNextQuestion: 0
-  timerText: {fileID: 1464143355}
 --- !u!4 &2085315043
 Transform:
   m_ObjectHideFlags: 0

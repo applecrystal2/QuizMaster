@@ -103,6 +103,7 @@ public class ChatGPTClient : MonoBehaviour
                        "- 문제와 선택지는 흥미롭고 참여하고 싶게 만들어주세요\n" +
                        "- 가능하면 실생활과 연관된 예시나 시나리오를 활용해주세요\n" +
                        "- 응답은 반드시 다음 JSON 형식으로만 제공해주세요:\n" +
+                       "- 응답은 반드시 다음 30자 이내로 제공해주세요:\n" +
                        "{\n" +
                        "  \"questions\": [\n" +
                        "    {\n" +
@@ -149,18 +150,11 @@ public class ChatGPTClient : MonoBehaviour
                         yield break;
                     }
                     
-                    if (response.choices[0].message == null)
-                    {
-                        Debug.LogError("Message content is null in ChatGPT response");
-                        yield break;
-                    }
-                    
                     string jsonContent = response.choices[0].message.content;
                     
                     if (string.IsNullOrEmpty(jsonContent))
                     {
                         Debug.LogError("Content is empty. Finish reason: " + response.choices[0].message);
-                        Debug.LogError("Consider increasing max_completion_tokens");
                         yield break;
                     }
                     
@@ -179,6 +173,8 @@ public class ChatGPTClient : MonoBehaviour
 
                     QuizData quizData = JsonUtility.FromJson<QuizData>(jsonContent);
                     List<QuestionSO> generatedQuestions = CreateQuestionSOs(quizData.questions);
+
+                    Debug.Log($"생성된 질문 수: {generatedQuestions.Count}");
                     quizGenerateHandler?.Invoke(generatedQuestions);
                 }
                 catch (Exception e)

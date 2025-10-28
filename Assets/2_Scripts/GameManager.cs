@@ -1,5 +1,4 @@
-using Unity.VisualScripting;
-using UnityEditor.Search;
+
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
@@ -84,7 +83,7 @@ public class GameManager : MonoBehaviour
         ButtonClickSound(); // 일반 버튼 클릭 효과음 재생
         Debug.Log("게임 종료");
         Application.Quit(); // 게임 종료
-        UnityEditor.EditorApplication.isPlaying = false;
+        //UnityEditor.EditorApplication.isPlaying = false;
     }
 
     // 일반 버튼 클릭 효과음 재생 메서드

@@ -114,9 +114,6 @@ public class Quiz : MonoBehaviour
         string topicToUse = GetTrendingTopic();
         chatGPTClient.GenerateQuizQuestions(questionCount, topicToUse);
         Debug.Log($"GernrateQuestionsIfNeeded: {topicToUse}");
-
-
-
     }
 
     private string GetTrendingTopic()
@@ -131,19 +128,18 @@ public class Quiz : MonoBehaviour
 
     void QuizGenerateHandler(List<QuestionSO> generatedQuestions)
     {
-        Debug.Log($"QuizGenerateHandler: {generatedQuestions.Count} questions received.");
         isGeneratingQuestions = false;
 
-        if(generatedQuestions == null || generatedQuestions.Count == 0)
+        if (generatedQuestions == null || generatedQuestions.Count == 0)
         {
-            Debug.LogError("문제 생성에 실패했습니다");
+            Debug.LogError("문제 생성에 실패했습니다. ChatGPT에서 질문을 생성하지 못했습니다.");
             loadingText.text = "문제 생성에 실패했습니다.\n인터넷 연결 확인 후 다시 시도하세요.";
             return;
         }
 
-        
+        Debug.Log($"생성된 질문 수: {generatedQuestions.Count}");
         questions.AddRange(generatedQuestions);
-        progressBar.maxValue = generatedQuestions.Count;
+        progressBar.maxValue = questions.Count;
 
         GetNextQuestion();
     }
@@ -193,11 +189,12 @@ public class Quiz : MonoBehaviour
     {
         if (questions.Count <= 0)
         {
-            Debug.Log("더 이상 질문이 없습니다.");
+            Debug.LogError("질문 리스트가 비어 있습니다. ChatGPT에서 질문을 생성하지 못했거나 추가되지 않았습니다.");
+            GameManager.Instance.ShowEndScreen();
             return;
         }
 
-        timer.ResetTimer(); // 타이머 초기화 및 남은 시간 표시
+        timer.ResetTimer(); // 타이머 초기화
         GameManager.Instance.ShowQuizScene();
         chooseAnswer = false;
         SetButtonState(true);
